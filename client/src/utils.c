@@ -1,4 +1,6 @@
 #include "utils.h"
+#include <errno.h>
+
 
 
 void* serializar_paquete(t_paquete* paquete, int bytes)
@@ -21,21 +23,38 @@ int crear_conexion(char *ip, char* puerto)
 	struct addrinfo hints;
 	struct addrinfo *server_info;
 
+	//Defino una variable local que indique errores o no
+	int err_cli; 
+
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	getaddrinfo(ip, puerto, &hints, &server_info);
+	getaddrinfo(ip, puerto, &hints, &server_info); 
+
+	//Condición de error
+	if (getaddrinfo(ip, puerto, &hints, &server_info) != 0){
+		printf("Error al realizar gettadrrinfo: %s\n", strerror(errno));
+		abort();
+	}	
+
 
 	// Ahora vamos a crear el socket.
-	int socket_cliente = 0;
-
+	int socket_cliente = socket(server_info->ai_family, 
+								server_info->ai_socktype, 
+								server_info->ai_protocol);
+								
 	// Ahora que tenemos el socket, vamos a conectarlo
+	err_cli = connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen);	
 
+	if (err_cli == -1){
+		error_show("No se pudo hacer connect");
+		abort();
+		
+	}
 
 	freeaddrinfo(server_info);
-
 	return socket_cliente;
 }
 
@@ -52,22 +71,26 @@ void enviar_mensaje(char* mensaje, int socket_cliente)
 	int bytes = paquete->buffer->size + 2*sizeof(int);
 
 	void* a_enviar = serializar_paquete(paquete, bytes);
+	int err_enviar = send(socket_cliente, a_enviar, bytes, 0);
 
-	send(socket_cliente, a_enviar, bytes, 0);
+	if (err_enviar == -1){
+		error_show("No se pudo enviar el mensaje");
+		abort();
+	}
 
 	free(a_enviar);
 	eliminar_paquete(paquete);
 }
 
 
-void crear_buffer(t_paquete* paquete)
+void crear_buffer(t_paquete* paquete) // crea un buffer vacio en t_paquete
 {
 	paquete->buffer = malloc(sizeof(t_buffer));
 	paquete->buffer->size = 0;
 	paquete->buffer->stream = NULL;
 }
 
-t_paquete* crear_paquete(void)
+t_paquete* crear_paquete(void) 
 {
 	t_paquete* paquete = malloc(sizeof(t_paquete));
 	paquete->codigo_operacion = PAQUETE;
@@ -105,4 +128,9 @@ void eliminar_paquete(t_paquete* paquete)
 void liberar_conexion(int socket_cliente)
 {
 	close(socket_cliente);
+}
+
+
+void error_show(const char *message) {
+    fprintf(stderr, "Error: %s\n", message);
 }

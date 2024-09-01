@@ -10,6 +10,7 @@
 #include<commons/collections/list.h>
 #include<string.h>
 #include<assert.h>
+#include <errno.h>
 
 #define PUERTO "4444"
 

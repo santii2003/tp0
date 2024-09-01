@@ -5,11 +5,13 @@ t_log* logger;
 int iniciar_servidor(void)
 {
 	// Quitar esta línea cuando hayamos terminado de implementar la funcion
-	assert(!"no implementado!");
+	/*assert(!"no implementado!");*/
 
 	int socket_servidor;
+	int err_serv;
+	errno = 0; //así no indica error previo
 
-	struct addrinfo hints, *servinfo, *p;
+	struct addrinfo hints, *servinfo; //*p -> agregada si la funcion no está
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_INET;
@@ -17,31 +19,54 @@ int iniciar_servidor(void)
 	hints.ai_flags = AI_PASSIVE;
 
 	getaddrinfo(NULL, PUERTO, &hints, &servinfo);
+	/*Comprobación de error*/
+	if (getaddrinfo(NULL, PUERTO, &hints, &servinfo) != 0){
+		printf("Error al realizar gettadrrinfo: %s\n", strerror(errno));
+		abort();
+	}
+
 
 	// Creamos el socket de escucha del servidor
+	socket_servidor = socket(servinfo->ai_family,
+							servinfo->ai_socktype, 
+							servinfo->ai_protocol);
+
+	//permitimos que varios sockets puedan hacer bind a un mismo puerto
+	err_serv = setsockopt(socket_servidor, SOL_SOCKET, SO_REUSEPORT, &(int){1}, sizeof(int));
+
+
 
 	// Asociamos el socket a un puerto
+	err_serv = bind(socket_servidor, servinfo->ai_addr, servinfo->ai_addrlen);
+	if (err_serv == -1) {
+		error_show("No se pudo hacer bind");
+		abort();
+	}
 
-	// Escuchamos las conexiones entrantes
+	// Escuchamos las conexiones entrantes		
+	err_serv = listen(socket_servidor, SOMAXCONN);
+	if (err_serv == -1) {
+		error_show("No se pudo hacer listen");
+		abort();
+	}
+
 
 	freeaddrinfo(servinfo);
-	log_trace(logger, "Listo para escuchar a mi cliente");
-
+	log_trace(logger, "%s","Listo para escuchar a mi cliente");
 	return socket_servidor;
 }
 
+
+// bloqueamos el proceso servidor!!
 int esperar_cliente(int socket_servidor)
 {
-	// Quitar esta línea cuando hayamos terminado de implementar la funcion
-	assert(!"no implementado!");
-
 	// Aceptamos un nuevo cliente
-	int socket_cliente;
+	int socket_cliente = accept(socket_servidor, NULL, NULL);
 	log_info(logger, "Se conecto un cliente!");
-
 	return socket_cliente;
 }
 
+// send y recv deben saber cuantos bytes van a recibir
 int recibir_operacion(int socket_cliente)
 {
 	int cod_op;
