@@ -1,5 +1,5 @@
 #include "utils.h"
-#include <errno.h>
+
 
 
 
@@ -131,6 +131,6 @@ void liberar_conexion(int socket_cliente)
 }
 
 
-void error_show(const char *message) {
+/*void error_show_fpf( char *message) {
     fprintf(stderr, "Error: %s\n", message);
-}
+}*/

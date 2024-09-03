@@ -5,7 +5,7 @@ int main(void)
 	/*---------------------------------------------------PARTE 2-------------------------------------------------------------*/
 
 	int conexion;
-    char *ip = (char*)malloc(16 * sizeof(char)); // Para una dirección IP de estilo IPv4
+    char *ip = malloc(16 * sizeof(char)); // Para una dirección IP de estilo IPv4
     char *puerto = (char*)malloc(6 * sizeof(char)); // Para un puerto (hasta 5 dígitos más terminador)
     char *valor = NULL; // Valor se inicializará desde la config directamente
 	t_log *logger;
