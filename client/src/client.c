@@ -19,7 +19,6 @@ int main(void)
 	// Escribi: "Hola! Soy un log"
 
 	/* ---------------- ARCHIVOS DE CONFIGURACION ---------------- */
-
 	config = iniciar_config();
 
 
@@ -58,7 +57,6 @@ int main(void)
 	terminar_programa(conexion, logger, config);
 
 	/*---------------------------------------------------PARTE 5-------------------------------------------------------------*/
-	// Proximamente
 }
 
 t_log *iniciar_logger(void)
@@ -66,7 +64,6 @@ t_log *iniciar_logger(void)
 	
 	t_log *nuevo_logger = log_create("tp0.log", "Hola! Soy un miserable Log", true, LOG_LEVEL_INFO);
 	log_info(nuevo_logger,"Ahora si soy un log?");
-								
 	return nuevo_logger;
 }
 
@@ -84,53 +81,44 @@ t_config *iniciar_config(void)
 void leer_consola(t_log *logger)
 {
 	char *leido;
-	/*Bucle que lee la consola e imprime por pantalla */
-	while (1) 
-	{
-	    leido = readline("> "); // Muestra el prompt y lee la entrada del usuario
-		
-        if (leido) {
-            add_history(leido); // Agrega la entrada al historial
-        }
 	
-        // Condición de corte
-        if (strcmp(leido, "") == 0) {
-            free(leido); // Libera la memoria de la línea leída
-            break; // Sale del bucle
-        }
+	leido = readline("> "); 
+	log_info(logger, "%s",leido); 
+	
 
-        printf("%s\n", leido); // Imprime la línea leída
-		log_info(logger, "%s",leido); // guarda las lineas en tp0.log!!
-        free(leido); // Libera la memoria de la línea leída
-    }
+	while(strcmp(leido, "") != 0){
+		free(leido);
+		leido = readline("> "); 
+		log_info(logger, "%s",leido); 
+	
+	}
+
 	// ¡No te olvides de liberar las lineas antes de regresar!
+	free(leido);
 }
 
 void paquete(int conexion)
 {
 	// Ahora toca lo divertido!
-	char *leido;
+	char *leido = NULL;
 	t_paquete *paquete = crear_paquete();
 
-	// Leemos y esta vez agregamos las lineas al paquete
-	while (1) 
-	{	
-	    leido = readline("> "); // Muestra el prompt y lee la entrada del usuario
-	   // Condición de corte
-        if ((strcmp(leido, "") == 0))
-		{
-            free(leido); // Libera la memoria de la línea leída
-            break; // Sale del bucle
-        }
+	leido = readline("> "); 
 	
-		int longitud_linea = (strlen(leido)+1);
-		agregar_a_paquete(paquete, leido, longitud_linea);
+	while(strcmp(leido, "") != 0){
+		agregar_a_paquete(paquete, leido, (strlen(leido)+1));
+		free(leido);
+		//volvemos a leer una nueva línea
+		leido = readline("> "); 
+	}
 
+	/*Enviamos paquete al socket conexion*/
+	enviar_paquete(paquete, conexion);
 
-        free(leido); // Libera la memoria de la línea leída
-    }
+	/*Liberamos las líneas leidas y el paquete enviado*/
+	free(leido);
 	eliminar_paquete(paquete);
-	// ¡No te olvides de liberar las líneas y el paquete antes de regresar!
+	
 }
 
 
@@ -140,6 +128,7 @@ void terminar_programa(int conexion, t_log *logger, t_config *config)
 {
 	liberar_conexion(conexion);
 	config_destroy(config);
-	
 	log_destroy(logger);
+	/*Mensaje por pantalla que muestra si terminó o no el cliente*/
+	printf("Cliente cerrado!!!! \n");
 }

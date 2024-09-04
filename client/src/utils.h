@@ -9,13 +9,12 @@
 /*Commons Library*/
 #include<commons/error.h>
 #include<commons/log.h>
+
 #include<netdb.h>
 #include<string.h>
-
 /*Leidas de consola*/
 #include<readline/readline.h>
 #include<readline/history.h>
-
 #include <errno.h>
 
 
