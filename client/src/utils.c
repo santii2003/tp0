@@ -23,7 +23,7 @@ int crear_conexion(char *ip, char* puerto)
 	struct addrinfo hints;
 	struct addrinfo *server_info;
 
-	//Defino una variable local que indique errores o no
+	//Defino una variable local que indique errores
 	int err_cli; 
 
 	memset(&hints, 0, sizeof(hints));
@@ -131,6 +131,3 @@ void liberar_conexion(int socket_cliente)
 }
 
 
-/*void error_show_fpf( char *message) {
-    fprintf(stderr, "Error: %s\n", message);
-}*/

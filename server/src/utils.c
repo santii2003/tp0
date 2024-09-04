@@ -12,7 +12,7 @@ int iniciar_servidor(void)
 	int err_serv;
 	errno = 0; //así no indica error previo
 
-	struct addrinfo hints, *servinfo; //*p -> agregada si la funcion no está
+	struct addrinfo hints, *servinfo; 
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_INET;
@@ -33,7 +33,7 @@ int iniciar_servidor(void)
 							servinfo->ai_protocol);
 
 	//permitimos que varios sockets puedan hacer bind a un mismo puerto
-	err_serv = setsockopt(socket_servidor, SOL_SOCKET, SO_REUSEPORT, &(int){1}, sizeof(int));
+	/*err_serv = setsockopt(socket_servidor, SOL_SOCKET, SO_REUSEPORT, &(int){1}, sizeof(int));*/
 
 
 

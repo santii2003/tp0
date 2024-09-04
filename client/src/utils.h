@@ -6,13 +6,16 @@
 #include<signal.h>
 #include<unistd.h>
 #include<sys/socket.h>
+/*Commons Library*/
+#include<commons/error.h>
+#include<commons/log.h>
 #include<netdb.h>
 #include<string.h>
-#include<commons/log.h>
-/**/
+
+/*Leidas de consola*/
 #include<readline/readline.h>
 #include<readline/history.h>
-#include<commons/error.h>
+
 #include <errno.h>
 
 
