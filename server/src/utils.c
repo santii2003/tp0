@@ -22,8 +22,8 @@ int iniciar_servidor(void)
 	getaddrinfo(NULL, PUERTO, &hints, &servinfo);
 	/*Comprobación de error*/
 	if (getaddrinfo(NULL, PUERTO, &hints, &servinfo) != 0){
-		printf("Error al realizar gettadrrinfo: %s\n", strerror(errno));
-		abort();
+    	error_show("....");
+        return -1;   
 	}
 
 
@@ -41,19 +41,21 @@ int iniciar_servidor(void)
 	err_serv = bind(socket_servidor, servinfo->ai_addr, servinfo->ai_addrlen);
 	if (err_serv == -1) {
 		error_show("No se pudo hacer bind");
-		abort();
+    	freeaddrinfo(servinfo);
+        return err_serv;
 	}
 
 	// Escuchamos las conexiones entrantes		
 	err_serv = listen(socket_servidor, SOMAXCONN);
 	if (err_serv == -1) {
 		error_show("No se pudo hacer listen");
-		abort();
+    	freeaddrinfo(servinfo);
+        return err_serv;
 	}
 
 
 	freeaddrinfo(servinfo);
-	log_trace(logger, "%s","Listo para escuchar a mi cliente");
+	/*log_trace(logger, "%s","Listo para escuchar a mi cliente");*/
 	return socket_servidor;
 }
 
